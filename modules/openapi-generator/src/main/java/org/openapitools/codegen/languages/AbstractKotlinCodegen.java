@@ -17,12 +17,17 @@
 
 package org.openapitools.codegen.languages;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.collect.ImmutableMap;
-import com.samskivert.mustache.Mustache;
-import io.swagger.v3.oas.models.media.ArraySchema;
-import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.StringSchema;
+import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
+import static org.openapitools.codegen.utils.StringUtils.*;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
@@ -33,16 +38,12 @@ import org.openapitools.codegen.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Function;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.ImmutableMap;
+import com.samskivert.mustache.Mustache;
 
-import static org.openapitools.codegen.utils.CamelizeOption.LOWERCASE_FIRST_LETTER;
-import static org.openapitools.codegen.utils.StringUtils.*;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 
 public abstract class AbstractKotlinCodegen extends DefaultCodegen implements CodegenConfig {
 
@@ -874,6 +875,11 @@ public abstract class AbstractKotlinCodegen extends DefaultCodegen implements Co
     public CodegenModel fromModel(String name, Schema schema) {
         CodegenModel m = super.fromModel(name, schema);
         m.optionalVars = m.optionalVars.stream().distinct().collect(Collectors.toList());
+        if (m.discriminator != null) {
+            for (CodegenProperty optionalVar : m.optionalVars) {
+                optionalVar.defaultValue = "null";
+            }
+        }
         // Update allVars/requiredVars/optionalVars with isInherited
         // Each of these lists contains elements that are similar, but they are all cloned
         // via CodegenModel.removeAllDuplicatedProperty and therefore need to be updated

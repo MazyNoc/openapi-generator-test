@@ -36,7 +36,6 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <forkMode>once</forkMode>
           <useFile>false</useFile>
         </configuration>
       </plugin>

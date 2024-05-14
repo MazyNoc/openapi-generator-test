@@ -29,7 +29,7 @@ import com.squareup.moshi.JsonClass
 sealed class Animal {
 
     @Json(name = "id")
-    val id: java.util.UUID
+    val id: java.util.UUID?
 }
 
 internal object AnimalSerializer : JsonContentPolymorphicSerializer<Animal>(Animal::class) {

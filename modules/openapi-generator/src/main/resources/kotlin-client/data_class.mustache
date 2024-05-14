@@ -39,7 +39,8 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-{{#discriminator}}import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+{{#discriminator}}
+  import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 {{/discriminator}}
@@ -67,13 +68,23 @@ import {{packageName}}.infrastructure.ITransformForStorage
 @Deprecated(message = "This schema is deprecated.")
 {{/isDeprecated}}
 {{>additionalModelTypeAnnotations}}
-{{#nonPublicApi}}internal {{/nonPublicApi}}{{#discriminator}}sealed class{{/discriminator}}{{^discriminator}}data class{{/discriminator}} {{classname}}{{^discriminator}} (
-
+{{#nonPublicApi}}internal {{/nonPublicApi}}{{#discriminator}}open class{{/discriminator}}{{^discriminator}}open class{{/discriminator}} {{classname}} (
 {{#allVars}}
-{{#required}}{{>data_class_req_var}}{{/required}}{{^required}}{{>data_class_opt_var}}{{/required}}{{^-last}},{{/-last}}
-
+  {{#required}}{{>empty_req_vars}}{{/required}}
+  {{^required}}{{>empty_opt_vars}}{{/required}}
+  {{#required}}{{>data_class_req_var}}{{/required}}{{^required}}{{>data_class_opt_var}}{{/required}}{{^-last}},{{/-last}}{{#-last}}
+  {{/-last}}
+  {{#discriminator}}
+    {{#vars}}
+      {{#required}}{{>data_class_req_var}}{{/required}}
+      {{^required}}{{>data_class_opt_var}}{{/required}}
+    {{/vars}}
+  {{/discriminator}}
 {{/allVars}}
-){{/discriminator}}{{#parent}}{{^serializableModel}}{{^parcelizeModels}} : {{{parent}}}(){{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#parent}}{{#serializableModel}}{{^parcelizeModels}} : {{{parent}}}(), Serializable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#parent}}{{^serializableModel}}{{#parcelizeModels}} : {{{parent}}}(), Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#parent}}{{#serializableModel}}{{#parcelizeModels}} : {{{parent}}}(), Serializable, Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{^parent}}{{#serializableModel}}{{^parcelizeModels}} : Serializable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{^parent}}{{^serializableModel}}{{#parcelizeModels}} : Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{^parent}}{{#serializableModel}}{{#parcelizeModels}} : Serializable, Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#generateRoomModels}}{{#parent}}, {{/parent}}{{^discriminator}}{{^parent}}:{{/parent}} ITransformForStorage<{{classname}}RoomModel>{{/discriminator}}{{/generateRoomModels}}{{#vendorExtensions.x-has-data-class-body}} {
+){{#parent}}{{^serializableModel}}{{^parcelizeModels}} : {{{parent}}}(
+{{#allVars}}{{#isInherited}}{{>parent_fields_transfer}}{{/isInherited}}{{/allVars}}
+){{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#parent}}{{#serializableModel}}{{^parcelizeModels}} : {{{parent}}}(), Serializable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#parent}}{{^serializableModel}}{{#parcelizeModels}} : {{{parent}}}(), Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#parent}}{{#serializableModel}}{{#parcelizeModels}} : {{{parent}}}(), Serializable, Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{^parent}}{{#serializableModel}}{{^parcelizeModels}} : Serializable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{^parent}}{{^serializableModel}}{{#parcelizeModels}} : Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{^parent}}{{#serializableModel}}{{#parcelizeModels}} : Serializable, Parcelable{{/parcelizeModels}}{{/serializableModel}}{{/parent}}{{#generateRoomModels}}{{#parent}}, {{/parent}}{{^discriminator}}{{^parent}}:{{/parent}} ITransformForStorage
+<{{classname}}RoomModel>{{/discriminator}}{{/generateRoomModels}}{{#vendorExtensions.x-has-data-class-body}} {
 {{/vendorExtensions.x-has-data-class-body}}
 {{#generateRoomModels}}
     companion object { }
@@ -88,9 +99,6 @@ import {{packageName}}.infrastructure.ITransformForStorage
         private const val serialVersionUID: Long = 123
     }
 {{/serializableModel}}
-{{#discriminator}}{{#vars}}{{#required}}
-{{>interface_req_var}}{{/required}}{{^required}}
-{{>interface_opt_var}}{{/required}}{{/vars}}{{/discriminator}}
 {{#hasEnums}}
 {{#vars}}
 {{#isEnum}}
